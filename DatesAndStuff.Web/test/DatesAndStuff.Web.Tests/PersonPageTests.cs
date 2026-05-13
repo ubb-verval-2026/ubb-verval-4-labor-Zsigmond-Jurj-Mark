@@ -150,6 +150,34 @@ public class PersonPageTests
             "The specified percentage should be greater than -10.");
     }
 
+    [Test]
+    public void BlazeDemo_MexicoCity_To_Dublin_ShouldHaveAtLeastThreeFlights()
+    {
+        // Arrange
+        driver.Navigate().GoToUrl("https://blazedemo.com");
+
+        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
+        // Departure city kiválasztása JavaScripttel
+        var js = (IJavaScriptExecutor)driver;
+
+        var fromSelect = wait.Until(ExpectedConditions.ElementExists(By.Name("fromPort")));
+        js.ExecuteScript("arguments[0].value = 'Mexico City';", fromSelect);
+
+        var toSelect = wait.Until(ExpectedConditions.ElementExists(By.Name("toPort")));
+        js.ExecuteScript("arguments[0].value = 'Dublin';", toSelect);
+
+        // Act
+        driver.FindElement(By.CssSelector("input[type='submit']")).Click();
+
+        // Assert
+        var flightRows = wait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(
+            By.CssSelector("table.table tbody tr")));
+
+        flightRows.Count.Should().BeGreaterThanOrEqualTo(3,
+            because: "Mexico City és Dublin között legalább 3 járatnak kell lennie");
+    }
+
     private bool IsElementPresent(By by)
     {
         try
